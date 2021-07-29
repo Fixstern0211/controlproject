@@ -228,91 +228,91 @@ class MainActivity : AppCompatActivity() {
     private fun receiveMail(user: String?, password: String?) {
 
         val config: EmailKit.Config = EmailKit.Config()
-                .setSMTP(smtp, smtpPort, true)
-                .setIMAP(host, port, ssl)
-                .setAccount(user)
-                .setPassword(password)
+            .setSMTP(smtp, smtpPort, true)
+            .setIMAP(host, port, ssl)
+            .setAccount(user)
+            .setPassword(password)
 
-            EmailKit.useIMAPService(config)
-                    .inbox
-                    .load(-1, object : EmailKit.GetLoadCallback {
-                        override fun onSuccess(msgList: List<Message>) {
-                            for (msg in msgList) {
+        EmailKit.useIMAPService(config)
+            .inbox
+            .load(-1, object : EmailKit.GetLoadCallback {
+                override fun onSuccess(msgList: List<Message>) {
+                    for (msg in msgList) {
 
-                                if (msg.subject == "order" && !msg.flags.isRead) {
+                        if (msg.subject == "order" && !msg.flags.isRead) {
 
-                                    Log.e(TAG, "connect successful, start to receive email")
+                            Log.e(TAG, "connect successful, start to receive email")
 
-                                    Log.i(TAG, "uid：" + msg.uid)
-                                    Log.i(TAG, "subject：" + msg.subject)
-                                    Log.i(TAG, "date：" + msg.sentDate.text)
-                                    Log.i(TAG, "from：" + msg.sender.address)
-                                    Log.i(TAG, "is Read：" + msg.flags.isRead)
-                                    Log.i(TAG, "---------------------------------------")
+                            Log.i(TAG, "uid：" + msg.uid)
+                            Log.i(TAG, "subject：" + msg.subject)
+                            Log.i(TAG, "date：" + msg.sentDate.text)
+                            Log.i(TAG, "from：" + msg.sender.address)
+                            Log.i(TAG, "is Read：" + msg.flags.isRead)
+                            Log.i(TAG, "---------------------------------------")
 
-                                    val content = msg.content.mainBody.text
-                                    Log.e(TAG, "content ：$content")
+                            val content = msg.content.mainBody.text
+                            Log.e(TAG, "content ：$content")
 
-                                    val index: Int = content.indexOf("order")
-                                    val cont: String = content.substring(index)
-                                    Log.e(TAG, "index $index")
-                                    Log.e(TAG, "cont $cont")
+                            val index: Int = content.indexOf("order")
+                            val cont: String = content.substring(index)
+                            Log.e(TAG, "index $index")
+                            Log.e(TAG, "cont $cont")
 
-                                    when {
-                                        cont.startsWith("order:photo") -> {
-                                            countTime = 0
-                                            mCameraUtil?.initCamera()
-                                            Toast.makeText(this@MainActivity,"taking photo",Toast.LENGTH_LONG).show()
-                                            Log.e("TAG", "start to take photo")
+                            when {
+                                cont.startsWith("order:photo") -> {
+                                    countTime = 0
+                                    mCameraUtil?.initCamera()
+                                    Toast.makeText(this@MainActivity,"taking photo",Toast.LENGTH_LONG).show()
+                                    Log.e("TAG", "start to take photo")
 
-                                        }
-                                        cont.startsWith("order:video") -> {
-                                            val bodys = content.split(";")
-                                            if (bodys.size > 1) {
-                                                try {
-                                                    countTime = unitTime * bodys[1].toInt()
-                                                } catch (e: Exception) {
-                                                    Log.e("TAG", "getAllEmail: time format wrong")
-                                                    countTime = unitTime * 1
-                                                }
-                                            }
-                                            mCameraUtil?.startRecord()
-                                            Toast.makeText(this@MainActivity,"video recording",Toast.LENGTH_LONG).show()
-                                            Log.e("TAG", "start to record")
-
-                                        }
-                                        cont.startsWith("order:audio") -> {
-                                            val bodys = content.split(";")
-                                            if (bodys.size > 1) {
-                                                try {
-                                                    countTime = unitTime * bodys[1].toInt()
-                                                } catch (e: Exception) {
-                                                    Log.e("TAG", "getAllEmail: time format wrong")
-                                                    countTime = unitTime * 1
-                                                }
-                                            }
-                                            if (audioUtil == null) audioUtil = AudioUtil()
-                                            audioUtil?.startRecord(this@MainActivity)
-                                            Toast.makeText(this@MainActivity,"audio recording",Toast.LENGTH_LONG).show()
-                                            Log.e("TAG", "start to take record audio")
+                                }
+                                cont.startsWith("order:video") -> {
+                                    val bodys = content.split(";")
+                                    if (bodys.size > 1) {
+                                        try {
+                                            countTime = unitTime * bodys[1].toInt()
+                                        } catch (e: Exception) {
+                                            Log.e("TAG", "getAllEmail: time format wrong")
+                                            countTime = unitTime * 1
                                         }
                                     }
+                                    mCameraUtil?.startRecord()
+                                    Toast.makeText(this@MainActivity,"video recording",Toast.LENGTH_LONG).show()
+                                    Log.e("TAG", "start to record")
 
-                                    isAction = true
-                                    time = 0
-
-
-                                } else {
-                                    Log.e(TAG, "no order")
+                                }
+                                cont.startsWith("order:audio") -> {
+                                    val bodys = content.split(";")
+                                    if (bodys.size > 1) {
+                                        try {
+                                            countTime = unitTime * bodys[1].toInt()
+                                        } catch (e: Exception) {
+                                            Log.e("TAG", "getAllEmail: time format wrong")
+                                            countTime = unitTime * 1
+                                        }
+                                    }
+                                    if (audioUtil == null) audioUtil = AudioUtil()
+                                    audioUtil?.startRecord(this@MainActivity)
+                                    Toast.makeText(this@MainActivity,"audio recording",Toast.LENGTH_LONG).show()
+                                    Log.e("TAG", "start to take record audio")
                                 }
                             }
 
-                        }
+                            isAction = true
+                            time = 0
 
-                        override fun onFailure(errMsg: String) {
-                            Log.i(TAG, errMsg)
+
+                        } else {
+                            Log.e(TAG, "no order")
                         }
-                    })
+                    }
+
+                }
+
+                override fun onFailure(errMsg: String) {
+                    Log.i(TAG, errMsg)
+                }
+            })
     }
 
     /**
@@ -380,10 +380,10 @@ class MainActivity : AppCompatActivity() {
                 values.put("read", "0")
                 values.put("body", "read $body")
                 contentResolver.update(
-                        Uri.parse("content://sms/"),
-                        values,
-                        "_id=?",
-                        arrayOf(SmsMessageId)
+                    Uri.parse("content://sms/"),
+                    values,
+                    "_id=?",
+                    arrayOf(SmsMessageId)
                 )
 
                 c.moveToNext()
@@ -448,6 +448,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         mCameraUtil?.stopRecord()
+        ActivityCollection.AppExit(this@MainActivity)
         super.onDestroy()
     }
 
@@ -524,13 +525,12 @@ class MainActivity : AppCompatActivity() {
         // width and height
         params_sur.width = 225
         params_sur.height = 300
-        //  params_sur.alpha = 255;
-        //  params_sur.alpha = 255;
+        //  params_sur.alpha = 1f;
+        //  params_sur.alpha = 1f;
         surfaceview?.layoutParams = params_sur
 
         surfaceview?.holder?.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS)
-        // surface.getHolder().setFixedSize(800, 1024);
-        // surface.getHolder().setFixedSize(800, 1024);
+
         surfaceview?.holder?.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 surfaceHolder = holder
